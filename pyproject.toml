@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecommerce-demand-forecasting"
+version = "1.0.0"
+description = "A leakage-safe ecommerce demand forecasting case study with rolling backtests."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Parisa Mostafavi" }]
+dependencies = [
+  "matplotlib>=3.9",
+  "numpy>=2.0",
+  "pandas>=2.2",
+  "scikit-learn>=1.5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "ruff>=0.9",
+]
+
+[project.scripts]
+demand-forecast = "ecommerce_forecasting.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

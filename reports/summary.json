@@ -1,0 +1,19 @@
+{
+  "data_is_synthetic": true,
+  "forecast_horizon_days": 56,
+  "history_end": "2025-12-31",
+  "history_rows": 4384,
+  "history_start": "2023-01-01",
+  "holdout_bias": 0.005304,
+  "holdout_interval_coverage": 0.808036,
+  "holdout_wape": 0.049172,
+  "scenario_incremental_orders": 17878.84,
+  "selected_models": {
+    "Beauty": "driver_ridge",
+    "Electronics": "driver_ridge",
+    "Grocery": "driver_ridge",
+    "Home": "driver_ridge"
+  },
+  "target_interval_coverage": 0.8,
+  "validation_folds": 3
+}
