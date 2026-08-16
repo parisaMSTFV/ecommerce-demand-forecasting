@@ -16,7 +16,7 @@ def test_evaluation_windows_do_not_overlap_holdout() -> None:
         pd.Timestamp("2025-09-11"),
     ]
     assert holdout_start == pd.Timestamp("2025-11-06")
-    assert validation_starts[-1] + pd.Timedelta(days=56) == holdout_start
+    assert validation_starts[-1] + pd.offsets.Day(56) == holdout_start
 
 
 def test_model_selection_uses_lowest_category_wape() -> None:

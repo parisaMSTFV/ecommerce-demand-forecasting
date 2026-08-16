@@ -152,7 +152,7 @@ def generate_future_drivers(
         raise ValueError("horizon must be positive")
 
     chosen = _validate_categories(categories)
-    dates = pd.date_range(last_history_date + pd.Timedelta(days=1), periods=horizon, freq="D")
+    dates = pd.date_range(last_history_date + pd.offsets.Day(1), periods=horizon, freq="D")
     frames: list[pd.DataFrame] = []
 
     for category in chosen:
