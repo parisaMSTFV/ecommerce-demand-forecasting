@@ -33,4 +33,6 @@ jobs:
       - name: Pipeline smoke test
         env:
           MPLCONFIGDIR: /tmp/matplotlib
-        run: python -m ecommerce_forecasting.cli smoke
+        run: |
+          python -m ecommerce_forecasting.cli smoke
+          python -m ecommerce_forecasting.cli smoke-supplied

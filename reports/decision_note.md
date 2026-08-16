@@ -1,5 +1,9 @@
 # Forecast decision note
 
+## Evidence boundary
+
+Results use generated synthetic data and are a demonstration, not evidence of performance on an external business dataset.
+
 ## Recommendation
 
 Use the category-specific model selection for the next 56-day capacity plan. The
@@ -24,6 +28,7 @@ The proposed two-week campaign for Beauty and Home changes the modelled
 56-day demand by **17,879 orders** versus the base plan. This is
 a demand scenario, not a causal lift estimate. Finance and operations should
 apply their own margin and fulfilment constraints before approval.
+
 
 ## Guardrails
 

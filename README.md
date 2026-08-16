@@ -2,15 +2,43 @@
 
 [![CI](https://github.com/parisaMSTFV/ecommerce-demand-forecasting/actions/workflows/ci.yml/badge.svg)](https://github.com/parisaMSTFV/ecommerce-demand-forecasting/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB)](https://www.python.org/)
-[![Data](https://img.shields.io/badge/data-100%25%20synthetic-0F766E)](DATA_PROVENANCE.md)
+[![Demo data](https://img.shields.io/badge/demo%20data-synthetic-0F766E)](DATA_PROVENANCE.md)
 
-A reproducible forecasting case study that converts category-level ecommerce
-demand into an eight-week capacity plan. The project emphasises leakage-safe
-evaluation, honest baseline comparison, forecast uncertainty and business
-decision support.
+Capacity planning fails when a forecast is accurate on average but misses peaks
+or leaks future commercial drivers. This project turns category-day demand into
+an eight-week plan with rolling validation, an untouched holdout, calibrated
+intervals and a guarded supplied-input path.
 
-> All records, volumes, categories and commercial drivers are synthetic. No
-> employer data, code, schema or business rule is used.
+> **Evidence boundary:** every metric and chart committed to this repository
+> comes from generated synthetic data. They do not establish performance on a
+> real business dataset.
+
+| Executed synthetic evidence | Result |
+|---|---:|
+| Rolling-validation WAPE | **5.0%** |
+| Improvement vs seasonal naive | **33.6%** |
+| Untouched 56-day holdout WAPE | **4.9%** |
+| 80% interval coverage | **80.8%** |
+
+![Model comparison](reports/figures/model_comparison.png)
+
+Two modes are executable: the reproducible synthetic case study and a guarded
+contract for a user's aggregate category-day history plus known-future drivers.
+Supplied files are read in place, not copied into the output; their provenance
+declarations are recorded but not independently verified.
+
+```bash
+# Published synthetic case study
+demand-forecast run --output-dir reports
+
+# Your data; output directory must be new or empty
+demand-forecast run-supplied --history-csv /secure/history.csv \
+  --future-drivers-csv /secure/future_drivers.csv \
+  --provenance-json /secure/provenance.json --output-dir /secure/forecast-output
+```
+
+See the exact schemas, validation rules and privacy boundary in the
+[supplied-input contract](docs/supplied_input_contract.md).
 
 ## Business question
 
@@ -28,7 +56,7 @@ The pipeline:
 - translates uncertainty into a capacity risk buffer;
 - separates a predictive campaign scenario from causal lift.
 
-## Validated results
+## Validated synthetic-demo results
 
 The complete pipeline was run on 4,384 synthetic category-day records from
 2023-01-01 through 2025-12-31.
@@ -53,8 +81,6 @@ outcome was produced by the run rather than imposed by the pipeline.
 | Grocery | 3.9% | +0.1% | 83.9% |
 | Home | 5.6% | +0.7% | 82.1% |
 
-![Model comparison](reports/figures/model_comparison.png)
-
 ![Holdout actual versus forecast](reports/figures/holdout_forecast.png)
 
 The proposed two-week campaign is applied only to Beauty and Home. The model
@@ -72,7 +98,7 @@ appropriate capacity input.
 
 ```mermaid
 flowchart TD
-    A["Synthetic history"] --> B["3 rolling validation folds"]
+    A["Validated history"] --> B["3 rolling validation folds"]
     B --> C["Model selection by category"]
     B --> D["Interval calibration"]
     C --> E["Untouched 56-day holdout"]
@@ -107,6 +133,8 @@ scripts/                     sensitive-content check
 ```
 
 Generated row-level data is stored under `data/generated/` and excluded from Git.
+Supplied raw files are never copied; local report outputs can still contain derived
+category-day predictions and should be handled according to the source policy.
 
 ## Run locally
 
@@ -126,6 +154,12 @@ On Windows PowerShell, activate the environment with:
 
 The full run writes reproducible outputs to `reports/`.
 
+To exercise both data paths without changing tracked reports:
+
+```bash
+make smoke
+```
+
 ## Documentation
 
 - [Analysis plan](docs/analysis_plan.md)
@@ -133,6 +167,7 @@ The full run writes reproducible outputs to `reports/`.
 - [Modeling notes](docs/modeling_notes.md)
 - [Interview guide](docs/interview_guide.md)
 - [Data provenance](DATA_PROVENANCE.md)
+- [Supplied-input contract](docs/supplied_input_contract.md)
 - [Decision note](reports/decision_note.md)
 
 ## Limitations
@@ -142,6 +177,7 @@ The full run writes reproducible outputs to `reports/`.
 - Residual intervals are empirical and do not guarantee conditional coverage.
 - Summed category bounds are a planning range, not an exact total-demand interval.
 - The campaign scenario is predictive; it does not estimate causal incrementality.
+- Supplied-input provenance is declared by the user and is not independently verified.
 
 ## License
 

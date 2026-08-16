@@ -32,8 +32,10 @@ def create_charts(
     validation_metrics: pd.DataFrame,
     holdout_predictions: pd.DataFrame,
     future_predictions: pd.DataFrame,
-    scenario_impact: pd.DataFrame,
+    scenario_impact: pd.DataFrame | None,
     output_dir: Path,
+    *,
+    history_label: str = "Synthetic daily demand",
 ) -> None:
     """Write all charts used by the README and reports."""
 
@@ -43,7 +45,7 @@ def create_charts(
     history_total = history.groupby("date", as_index=False)["demand"].sum().tail(240)
     fig, axis = plt.subplots(figsize=(11, 4.5))
     axis.plot(history_total["date"], history_total["demand"], color=ACCENT, linewidth=1.8)
-    axis.set(title="Synthetic daily demand — last 240 days", ylabel="Adjusted orders")
+    axis.set(title=f"{history_label} — last 240 days", ylabel="Adjusted orders")
     _style_axis(axis)
     fig.tight_layout()
     fig.savefig(chart_dir / "demand_history.png", dpi=160)
@@ -152,38 +154,71 @@ def create_charts(
     fig.savefig(chart_dir / "future_capacity_forecast.png", dpi=160)
     plt.close(fig)
 
-    ordered_impact = scenario_impact.sort_values("incremental_orders")
-    fig, axis = plt.subplots(figsize=(8, 4.5))
-    bars = axis.barh(
-        ordered_impact["category"],
-        ordered_impact["incremental_orders"],
-        color=SECONDARY,
-    )
-    axis.bar_label(bars, fmt="%+.0f", padding=4, color=INK)
-    axis.set(title="Proposed campaign scenario", xlabel="Incremental forecast orders")
-    _style_axis(axis)
-    fig.tight_layout()
-    fig.savefig(chart_dir / "campaign_scenario.png", dpi=160)
-    plt.close(fig)
+    if scenario_impact is not None:
+        ordered_impact = scenario_impact.sort_values("incremental_orders")
+        fig, axis = plt.subplots(figsize=(8, 4.5))
+        bars = axis.barh(
+            ordered_impact["category"],
+            ordered_impact["incremental_orders"],
+            color=SECONDARY,
+        )
+        axis.bar_label(bars, fmt="%+.0f", padding=4, color=INK)
+        axis.set(title="Proposed campaign scenario", xlabel="Incremental forecast orders")
+        _style_axis(axis)
+        fig.tight_layout()
+        fig.savefig(chart_dir / "campaign_scenario.png", dpi=160)
+        plt.close(fig)
 
 
 def write_decision_memo(
     holdout_metrics: pd.DataFrame,
     selections: pd.DataFrame,
-    scenario_impact: pd.DataFrame,
+    scenario_impact: pd.DataFrame | None,
     capacity_plan: pd.DataFrame,
     output_dir: Path,
+    *,
+    data_source_mode: str = "generated_synthetic",
 ) -> None:
     """Create a concise business-facing interpretation from validated outputs."""
 
     overall = holdout_metrics.loc[holdout_metrics["category"] == "Overall"].iloc[0]
-    total_increment = scenario_impact["incremental_orders"].sum()
     peak = capacity_plan.loc[capacity_plan["upper"].idxmax()]
     selected_lines = "\n".join(
         f"- {row.category}: `{row.selected_model}`"
         for row in selections.itertuples(index=False)
     )
+    source_note = (
+        "Results use generated synthetic data and are a demonstration, not evidence of "
+        "performance on an external business dataset."
+        if data_source_mode == "generated_synthetic"
+        else "Results use validated, user-supplied aggregate inputs. Provenance fields are "
+        "user declarations and were not independently verified."
+    )
+    scenario_section = ""
+    if scenario_impact is not None:
+        total_increment = scenario_impact["incremental_orders"].sum()
+        scenario_section = f"""
+## Proposed campaign scenario
+
+The proposed two-week campaign for Beauty and Home changes the modelled
+56-day demand by **{total_increment:,.0f} orders** versus the base plan. This is
+a demand scenario, not a causal lift estimate. Finance and operations should
+apply their own margin and fulfilment constraints before approval.
+"""
+    else:
+        scenario_section = """
+## Supplied future plan
+
+The capacity forecast is conditional on the supplied future driver schedule.
+No alternative campaign scenario or causal incrementality claim is produced in
+supplied-input mode.
+"""
+
     content = f"""# Forecast decision note
+
+## Evidence boundary
+
+{source_note}
 
 ## Recommendation
 
@@ -199,13 +234,7 @@ cost of under-capacity is higher than the cost of a short-lived buffer.
 ## Selected model by category
 
 {selected_lines}
-
-## Proposed campaign scenario
-
-The proposed two-week campaign for Beauty and Home changes the modelled
-56-day demand by **{total_increment:,.0f} orders** versus the base plan. This is
-a demand scenario, not a causal lift estimate. Finance and operations should
-apply their own margin and fulfilment constraints before approval.
+{scenario_section}
 
 ## Guardrails
 
@@ -217,10 +246,15 @@ apply their own margin and fulfilment constraints before approval.
     (output_dir / "decision_note.md").write_text(content, encoding="utf-8")
 
 
-def write_summary_json(summary: dict[str, object], output_dir: Path) -> None:
+def write_summary_json(
+    summary: dict[str, object],
+    output_dir: Path,
+    *,
+    filename: str = "summary.json",
+) -> None:
     """Write machine-readable headline results."""
 
-    (output_dir / "summary.json").write_text(
+    (output_dir / filename).write_text(
         json.dumps(summary, indent=2, sort_keys=True),
         encoding="utf-8",
     )

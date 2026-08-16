@@ -1,10 +1,14 @@
-.PHONY: install run test lint security check
+.PHONY: install run smoke test lint security check
 
 install:
 	python -m pip install -e ".[dev]"
 
 run:
 	MPLCONFIGDIR=.matplotlib python -m ecommerce_forecasting.cli run
+
+smoke:
+	MPLCONFIGDIR=.matplotlib python -m ecommerce_forecasting.cli smoke
+	MPLCONFIGDIR=.matplotlib python -m ecommerce_forecasting.cli smoke-supplied
 
 test:
 	MPLCONFIGDIR=.matplotlib python -m pytest
@@ -15,4 +19,4 @@ lint:
 security:
 	python scripts/check_sensitive.py
 
-check: lint test security
+check: lint test security smoke

@@ -18,7 +18,7 @@ def _check_inputs(train: pd.DataFrame, future: pd.DataFrame) -> tuple[pd.DataFra
         raise ValueError("Forecasting requires at least 84 days of history")
     if ordered_future.empty:
         raise ValueError("Future driver frame cannot be empty")
-    expected_start = ordered_train["date"].max() + pd.Timedelta(days=1)
+    expected_start = ordered_train["date"].max() + pd.offsets.Day(1)
     if ordered_future["date"].min() != expected_start:
         raise ValueError("Future dates must start one day after training history")
     return ordered_train, ordered_future

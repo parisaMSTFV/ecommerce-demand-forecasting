@@ -20,9 +20,9 @@ def evaluation_dates(
 
     if horizon < 1 or validation_folds < 1:
         raise ValueError("horizon and validation_folds must be positive")
-    holdout_start = pd.Timestamp(last_date) - pd.Timedelta(days=horizon - 1)
+    holdout_start = pd.Timestamp(last_date) - pd.offsets.Day(horizon - 1)
     validation_starts = [
-        holdout_start - pd.Timedelta(days=horizon * fold_back)
+        holdout_start - pd.offsets.Day(horizon * fold_back)
         for fold_back in range(validation_folds, 0, -1)
     ]
     return validation_starts, holdout_start
@@ -43,7 +43,7 @@ def rolling_validation(
     for category, category_history in history.groupby("category", sort=True):
         ordered = category_history.sort_values("date").reset_index(drop=True)
         for fold_id, start_date in enumerate(validation_starts, start=1):
-            end_date = start_date + pd.Timedelta(days=horizon - 1)
+            end_date = start_date + pd.offsets.Day(horizon - 1)
             train = ordered.loc[ordered["date"] < start_date].copy()
             actual = ordered.loc[ordered["date"].between(start_date, end_date)].copy()
             if len(actual) != horizon:
