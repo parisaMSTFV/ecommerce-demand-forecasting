@@ -10,5 +10,6 @@ __pycache__/
 data/generated/
 reports/generated/
 reports/tmp/
+local-runs/
 *.egg-info/
 .DS_Store

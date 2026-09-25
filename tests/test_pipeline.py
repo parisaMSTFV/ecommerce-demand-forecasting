@@ -1,6 +1,17 @@
 from pathlib import Path
 
+from ecommerce_forecasting.cli import build_parser
+from ecommerce_forecasting.config import ForecastConfig
 from ecommerce_forecasting.pipeline import run_smoke_pipeline, run_supplied_smoke_pipeline
+
+
+def test_default_run_keeps_local_outputs_outside_committed_evidence() -> None:
+    config = ForecastConfig()
+    args = build_parser().parse_args(["run"])
+
+    assert config.output_dir == Path("local-runs/latest")
+    assert config.generated_data_dir == Path("local-runs/latest/generated")
+    assert args.output_dir == Path("local-runs/latest")
 
 
 def test_smoke_pipeline_is_reproducible(tmp_path: Path) -> None:
