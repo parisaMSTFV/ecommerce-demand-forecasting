@@ -20,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the ecommerce demand forecast case study.")
     subparsers = parser.add_subparsers(dest="command", required=True)
     run_parser = subparsers.add_parser("run", help="Run the complete reproducible analysis.")
-    run_parser.add_argument("--output-dir", type=Path, default=Path("reports"))
+    run_parser.add_argument("--output-dir", type=Path, default=Path("local-runs/latest"))
     supplied_parser = subparsers.add_parser(
         "run-supplied",
         help="Run on validated aggregate history and known-future drivers.",

@@ -15,8 +15,8 @@ class ForecastConfig:
     interval_coverage: float = 0.80
     random_seed: int = 42
     categories: tuple[str, ...] = ("Beauty", "Electronics", "Grocery", "Home")
-    output_dir: Path = Path("reports")
-    generated_data_dir: Path = Path("data/generated")
+    output_dir: Path = Path("local-runs/latest")
+    generated_data_dir: Path = Path("local-runs/latest/generated")
 
 
 MODEL_NAMES: tuple[str, ...] = (

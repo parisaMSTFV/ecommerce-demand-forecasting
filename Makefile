@@ -4,7 +4,7 @@ install:
 	python -m pip install -e ".[dev]"
 
 run:
-	MPLCONFIGDIR=.matplotlib python -m ecommerce_forecasting.cli run
+	MPLCONFIGDIR=.matplotlib python -m ecommerce_forecasting.cli run --output-dir local-runs/latest
 
 smoke:
 	MPLCONFIGDIR=.matplotlib python -m ecommerce_forecasting.cli smoke

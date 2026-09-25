@@ -29,7 +29,7 @@ declarations are recorded but not independently verified.
 
 ```bash
 # Published synthetic case study
-demand-forecast run --output-dir reports
+demand-forecast run --output-dir local-runs/latest
 
 # Your data; output directory must be new or empty
 demand-forecast run-supplied --history-csv /secure/history.csv \
@@ -152,7 +152,9 @@ On Windows PowerShell, activate the environment with:
 .venv\Scripts\Activate.ps1
 ```
 
-The full run writes reproducible outputs to `reports/`.
+The full run writes reproducible outputs to the ignored `local-runs/latest/`
+directory. The validated evidence published with the repository remains under
+`reports/`.
 
 To exercise both data paths without changing tracked reports:
 
